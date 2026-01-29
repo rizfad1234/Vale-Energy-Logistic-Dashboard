@@ -3,118 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PT Vale Indonesia - Monitoring Compliance</title>
+    <title>Monitoring Compliance Energy & Logistic</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --vale-purple: #4b2c7f; --vale-gold: #ffc629; }
-        .bg-vale-purple { background-color: var(--vale-purple); }
-        .text-vale-purple { color: var(--vale-purple); }
-        .bg-vale-gold { background-color: var(--vale-gold); }
-        .bg-header { background: linear-gradient(90deg, #4b2c7f 0%, #2d1a4d 100%); }
-        #reminderContainer::-webkit-scrollbar { width: 4px; }
-        #reminderContainer::-webkit-scrollbar-thumb { background: var(--vale-gold); border-radius: 10px; }
-        .table-container::-webkit-scrollbar { height: 8px; }
-        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        body { background-color: #00a2ed; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .card-pbi { background: white; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* Header Biru Tua */
+        .header-pbi { background: #002050; color: white; padding: 12px 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .stat-box { background: #1a427a; color: white; border-radius: 4px; padding: 20px; text-align: center; }
+        .table-container::-webkit-scrollbar { height: 8px; width: 6px; }
+        .table-container::-webkit-scrollbar-thumb { background: #1a427a; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="p-4">
 
-    <nav class="bg-header shadow-lg px-6 py-4 sticky top-0 z-50">
-        <div class="max-w-[1800px] mx-auto flex justify-between items-center text-white">
-            <div class="flex items-center gap-6">
-                <div class="bg-white p-2 rounded-lg shadow-md flex items-center justify-center w-36 md:w-44">
-                    <img src="logo-vale.png" alt="Vale Logo" class="h-14"
-                         alt="Vale Logo" class="h-10 md:h-8 w-auto object-contain">
-                </div>
-                <div class="h-12 w-[2px] bg-vale-gold hidden md:block opacity-50"></div>
-                <h1 class="font-black uppercase tracking-widest text-base lg:text-xl leading-tight">
-                    Monitoring Compliance <br>
-                    <span class="text-xs font-medium opacity-70 tracking-normal">Energy & Logistic Department</span>
-                </h1>
-            </div>
-            <div class="flex flex-col items-end text-right">
-                <p id="live-clock" class="text-vale-gold font-mono font-bold text-2xl leading-none"></p>
-                <p class="text-[10px] uppercase opacity-70 tracking-[0.2em] mt-2 font-bold">PT. Vale Indonesia Tbk.</p>
-            </div>
+    <nav class="header-pbi mb-6 rounded shadow-lg flex justify-between items-center">
+        <div class="flex items-center gap-6">
+    <div class="flex items-center justify-center w-32 md:w-40">
+        <img src="logo-vale.png" alt="Vale Logo" class="h-" 
+             alt="Vale Logo" 
+             class="h-8 md:h-12 w-auto object-contain brightness-0 invert"> 
+             </div>
+    <div class="h-10 w-[2px] bg-white/20 hidden md:block"></div>
+    <div>
+        <h1 class="font-bold uppercase tracking-tight text-lg md:text-xl leading-none text-white">Monitoring Compliance</h1>
+        <p class="text-[10px] opacity-70 uppercase tracking-widest mt-1 text-white">Energy & Logistic Department</p>
+    </div>
+</div>
+
+        <div class="text-right flex flex-col justify-center border-l border-white/20 pl-6">
+            <p id="live-time" class="text-2xl font-black text-[#ffc629] font-mono leading-none"></p>
+            <p id="live-date" class="text-[10px] uppercase font-bold tracking-widest opacity-80 mt-1"></p>
         </div>
     </nav>
 
-    <div class="max-w-[1800px] mx-auto p-4 space-y-6">
+    <div class="max-w-[1800px] mx-auto space-y-6">
         
         <div class="grid grid-cols-12 gap-6">
-            <div class="col-span-12 lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border-t-4 border-vale-gold">
-                <label class="text-[10px] font-black text-vale-purple uppercase">Select Category</label>
-                <select id="areaSelector" class="w-full mt-1 p-2 bg-gray-50 border rounded font-bold text-vale-purple outline-none focus:ring-2 focus:ring-vale-purple transition-all">
-                    <option value="HOME">ALL AREAS (HOME)</option>
-                </select>
-                
-                <div class="mt-8 text-center border-t pt-6">
-                    <p class="text-[10px] text-gray-400 uppercase font-bold">Total Equipment</p>
-                    <h2 id="totalCount" class="text-5xl font-black text-vale-purple mt-2">0</h2>
+            <div class="col-span-12 lg:col-span-4 card-pbi p-6 relative">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <span class="text-xs font-black text-gray-500 uppercase">Compliance Distribution</span>
+                    <select id="areaSelector" class="border text-[10px] p-1 rounded bg-gray-50 font-bold outline-none cursor-pointer hover:bg-gray-100"></select>
+                </div>
+                <div class="h-[300px]"><canvas id="catPieChart"></canvas></div>
+                <div class="absolute top-[58%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold">Total Assets</p>
+                    <h2 id="totalCenter" class="text-4xl font-black text-[#1a427a]">0</h2>
                 </div>
             </div>
 
-            <div class="col-span-12 lg:col-span-5 bg-white p-6 rounded-xl shadow-sm">
-                <h3 class="text-xs font-bold text-gray-500 mb-6 uppercase flex items-center gap-2">
-                    <i class="fas fa-chart-bar text-vale-purple"></i> Status Of Compliance
-                </h3>
-                <div class="h-[250px]"><canvas id="barStatusChart"></canvas></div>
-            </div>
-
-            <div class="col-span-12 lg:col-span-5 bg-white p-6 rounded-xl shadow-sm">
-                <h3 class="text-xs font-bold text-gray-500 mb-6 uppercase flex items-center gap-2">
-                    <i class="fas fa-chart-pie text-vale-purple"></i> Distribution Analysis (Filter Active)
-                </h3>
-                <div class="flex h-[250px] gap-4">
-                    <div class="w-1/2 relative"><canvas id="pieStatusChart"></canvas></div>
-                    <div class="w-1/2 flex flex-col justify-center items-center bg-gray-50 rounded-xl p-4 text-center">
-                        <p class="text-[10px] text-gray-400 uppercase font-bold mb-4">Quick Overview</p>
-                        <div id="quickSummary" class="space-y-2 w-full"></div>
-                    </div>
-                </div>
+            <div class="col-span-12 lg:col-span-8 card-pbi p-6">
+                <p class="text-[10px] font-black text-gray-500 uppercase mb-4 border-b pb-2">Compliance Status Breakdown</p>
+                <div class="h-[300px]"><canvas id="catStatusBarChart"></canvas></div>
             </div>
         </div>
 
         <div class="grid grid-cols-12 gap-6">
-            <div class="col-span-12 lg:col-span-8 bg-white p-6 rounded-xl shadow-sm">
-                <h3 class="text-xs font-bold text-gray-500 mb-6 uppercase">License Status by Section</h3>
-                <div class="h-[300px]"><canvas id="sectionBarChart"></canvas></div>
+            <div class="col-span-12 lg:col-span-4 card-pbi p-6">
+                <p class="text-[10px] font-black text-gray-500 uppercase mb-4 border-b pb-2 text-center">Energy vs Logistic Ratio</p>
+                <div class="h-[250px]"><canvas id="deptPieChart"></canvas></div>
             </div>
 
-            <div class="col-span-12 lg:col-span-4 bg-slate-800 p-6 rounded-xl shadow-xl">
-                <h3 class="text-vale-gold text-[10px] font-bold mb-6 uppercase flex items-center gap-2">
-                    <i class="fas fa-bell animate-pulse text-red-500"></i> Critical Renewal Reminder
-                </h3>
-                <div id="reminderContainer" class="space-y-4 overflow-y-auto max-h-[260px] pr-2"></div>
+            <div class="col-span-12 lg:col-span-5 card-pbi p-6">
+                <p class="text-[10px] font-black text-gray-500 uppercase mb-4 border-b pb-2 text-center">Status by Department</p>
+                <div class="h-[250px]"><canvas id="deptStatusBarChart"></canvas></div>
+            </div>
+
+            <div class="col-span-12 lg:col-span-3 space-y-4">
+                <div class="stat-box shadow-xl border-b-4 border-white/10">
+                    <p class="text-[10px] uppercase font-bold opacity-80 mb-1">Total Equipment</p>
+                    <h2 id="totalRight" class="text-5xl font-black">0</h2>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="stat-box py-4">
+                        <p class="text-[9px] uppercase font-bold opacity-80">Energy</p>
+                        <p id="cntEnergy" class="text-2xl font-black">0</p>
+                    </div>
+                    <div class="stat-box py-4">
+                        <p class="text-[9px] uppercase font-bold opacity-80">Logistic</p>
+                        <p id="cntLogistic" class="text-2xl font-black">0</p>
+                    </div>
+                </div>
+                <div class="stat-box py-4 bg-[#002050] border-t-4 border-[#ffc629]">
+                    <p class="text-[10px] uppercase font-bold opacity-80">Comply Percentage</p>
+                    <h2 class="text-4xl font-black text-[#ffc629]">98%</h2>
+                </div>
             </div>
         </div>
 
-        <div class="col-span-12 bg-white p-8 rounded-xl shadow-sm border-b-4 border-vale-purple">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-vale-purple uppercase text-sm flex items-center gap-2">
-                    <i class="fas fa-list-ul text-vale-gold"></i> Detailed Equipment List
-                </h3>
-                <div id="filterIndicator" class="hidden flex items-center gap-3 bg-vale-purple text-white text-[10px] px-4 py-2 rounded-full font-bold shadow-md">
-                    <span>FILTERING: <span id="activeFilterName" class="text-vale-gold"></span></span>
-                    <button onclick="clearTableFilter()" class="border-l border-white/20 pl-3 hover:text-vale-gold transition-colors">CLEAR FILTER</button>
-                </div>
+        <div class="card-pbi overflow-hidden mb-8">
+            <div class="bg-gray-100 p-3 text-[10px] font-black uppercase border-b flex justify-between">
+                <span>Detailed Equipment List</span>
+                <span class="text-[#1a427a]">PT. Vale Indonesia Tbk.</span>
             </div>
-            <div class="table-container overflow-x-auto border rounded-xl shadow-inner bg-gray-50/50">
-                <table class="min-w-full divide-y divide-gray-200 text-[11px]">
-                    <thead class="bg-gray-100/80">
+            <div class="table-container overflow-x-auto max-h-[400px]">
+                <table class="min-w-full text-[11px] text-left border-collapse">
+                    <thead class="bg-white sticky top-0 border-b z-10 shadow-sm">
                         <tr>
-                            <th class="px-6 py-4 text-left font-black text-gray-500 uppercase tracking-wider">Section</th>
-                            <th class="px-6 py-4 text-left font-black text-gray-500 uppercase tracking-wider">Classification</th>
-                            <th class="px-6 py-4 text-left font-black text-gray-500 uppercase tracking-wider">Equipment</th>
-                            <th class="px-6 py-4 text-left font-black text-gray-500 uppercase tracking-wider">Due Date</th>
-                            <th class="px-6 py-4 text-left font-black text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-4 text-left font-black text-gray-500 uppercase tracking-wider text-right">Remaining</th>
+                            <th class="p-4 border-r font-black text-gray-400">CATEGORY</th>
+                            <th class="p-4 border-r font-black text-gray-400">SECTION</th>
+                            <th class="p-4 border-r font-black text-gray-400">EQUIPMENT</th>
+                            <th class="p-4 font-black text-gray-400">STATUS</th>
                         </tr>
                     </thead>
-                    <tbody id="dataTableBody" class="bg-white divide-y divide-gray-100"></tbody>
+                    <tbody id="dataTableBody" class="divide-y bg-white"></tbody>
                 </table>
             </div>
         </div>
@@ -122,227 +117,191 @@
 
     <script>
         Chart.register(ChartDataLabels);
-
+        
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwl68NIDQAuHyOQBmRMc1MdCibl9BJ9dQVNYQyo8klve-32GlwAmiy1jGL6RTma0-h6Tw/exec";
-        let masterData = {};
-        let charts = {};
-        let activeStatusFilter = null;
+        let masterData = {}, charts = {};
 
         async function init() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 masterData = await response.json();
-                const selector = document.getElementById('areaSelector');
+                const sel = document.getElementById('areaSelector');
                 
-                // Tambahkan opsi kategori dari Google Sheets
+                sel.innerHTML = '<option value="HOME">ALL AREAS (HOME)</option>';
                 Object.keys(masterData).forEach(name => {
-                    const opt = document.createElement('option');
-                    opt.value = name; opt.innerText = name;
-                    selector.appendChild(opt);
+                    if(name !== "Main Data for Looker Studio") {
+                        const opt = document.createElement('option');
+                        opt.value = name; opt.innerText = name; sel.appendChild(opt);
+                    }
                 });
 
-                selector.addEventListener('change', (e) => {
-                    activeStatusFilter = null;
-                    updateDashboard(e.target.value);
-                });
-
-                // Mode Default saat buka: HOME
-                updateDashboard("HOME");
-            } catch (err) { console.error("Error loading data:", err); }
+                sel.addEventListener('change', (e) => updateUI(e.target.value));
+                updateUI("HOME");
+            } catch (err) { console.error("Error:", err); }
         }
 
-        function updateDashboard(area) {
+        function updateUI(area) {
             let data;
             if (area === "HOME") {
-                // Meratakan (Flatten) semua data dari semua sheet
-                data = Object.values(masterData).flat();
+                // HANYA ambil data dari sheet Looker Studio (Target 473)
+                data = masterData["Main Data for Looker Studio"];
+                if (!data) data = Object.values(masterData).flat();
             } else {
                 data = masterData[area];
             }
 
             if (!data) return;
 
-            document.getElementById('totalCount').innerText = data.length;
+            document.getElementById('totalCenter').innerText = data.length;
+            document.getElementById('totalRight').innerText = data.length;
+            document.getElementById('cntEnergy').innerText = data.filter(i => (i.SECTION||"").includes('Energy')).length;
+            document.getElementById('cntLogistic').innerText = data.filter(i => (i.SECTION||"").includes('Logistic')).length;
 
-            const stats = {
-                VALID: data.filter(i => checkStatus(i, 'VALID')).length,
-                ATTENTION: data.filter(i => checkStatus(i, 'ATTENTION')).length,
-                BROKEN: data.filter(i => checkStatus(i, 'BROKEN')).length,
-                PLAN_SCRAP: data.filter(i => checkStatus(i, 'PLAN_SCRAP')).length,
-                NEW: data.filter(i => checkStatus(i, 'NEW')).length,
-                NOT_USE: data.filter(i => checkStatus(i, 'NOT USE')).length
-            };
-
-            renderMainCharts(stats);
-            renderSectionChart(data);
-            renderReminders(data.filter(i => checkStatus(i, 'ATTENTION')));
+            renderCharts(data);
+            renderSection2(data);
             renderTable(data);
-            
-            document.getElementById('quickSummary').innerHTML = `
-                <div class="bg-green-50 text-green-700 p-2 rounded-lg font-bold text-[10px] uppercase">Valid: ${stats.VALID}</div>
-                <div class="bg-yellow-50 text-orange-600 p-2 rounded-lg font-bold text-[10px] mt-2 uppercase">Attention: ${stats.ATTENTION}</div>
-                <div class="bg-red-50 text-red-700 p-2 rounded-lg font-bold text-[10px] mt-2 uppercase">Scrap: ${stats.PLAN_SCRAP}</div>
-            `;
         }
 
-        function checkStatus(item, target) {
-            return (item.STATUS_LICENSE || "").toString().trim().toUpperCase() === target;
+        function renderCharts(data) {
+    const area = document.getElementById('areaSelector').value;
+    
+    // Nama kategori utama sesuai referensi
+    const cats = ['Annual Inspection', 'Certification', 'Permit', 'Reporting'];
+    
+    // 1. DOUGHNUT CHART (KIRI) - Distribusi Total per Kategori
+    const catCounts = cats.map(c => data.filter(i => (i.CATEGORY || "").includes(c)).length);
+    
+    const ctxPie = document.getElementById('catPieChart').getContext('2d');
+    if (charts.catPie) charts.catPie.destroy();
+    charts.catPie = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: cats,
+            datasets: [{ 
+                data: catCounts, 
+                backgroundColor: ['#3a86ff', '#1a427a', '#fb5607', '#7209b7'],
+                hoverOffset: 15
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            cutout: '75%',
+            plugins: { 
+                legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } },
+                datalabels: { color: '#fff', font: { weight: 'bold', size: 11 } }
+            }
         }
+    });
 
-        function renderMainCharts(stats) {
-            const ctxStatus = document.getElementById('pieStatusChart').getContext('2d');
-            if (charts.status) charts.status.destroy();
-            charts.status = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(stats),
-                    datasets: [{
-                        data: Object.values(stats),
-                        backgroundColor: ['#4b2c7f', '#ffc629', '#94a3b8', '#ef4444', '#3b82f6', '#1e293b']
-                    }]
+    // 2. GROUPED BAR CHART (KANAN) - Status per Kategori (Valid, Attention, Broken)
+    const ctxBar = document.getElementById('catStatusBarChart').getContext('2d');
+    if (charts.barStatus) charts.barStatus.destroy();
+    charts.barStatus = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: cats,
+            datasets: [
+                {
+                    label: 'Valid',
+                    data: cats.map(c => data.filter(i => (i.CATEGORY || "").includes(c) && (i.STATUS_LICENSE || "").trim().toUpperCase() === 'VALID').length),
+                    backgroundColor: '#3a86ff',
+                    barPercentage: 0.2, // Membuat diagram balok tipis
+                    categoryPercentage: 0.8
                 },
-                options: { 
-                    maintainAspectRatio: false, 
-                    onClick: (event, elements) => {
-                        if (elements.length > 0) {
-                            const index = elements[0].index;
-                            activeStatusFilter = charts.status.data.labels[index];
-                            const currentArea = document.getElementById('areaSelector').value;
-                            const dataToFilter = (currentArea === "HOME") ? Object.values(masterData).flat() : masterData[currentArea];
-                            renderTable(dataToFilter);
-                        }
-                    },
-                    plugins: { 
-                        legend: { display: false },
-                        datalabels: {
-                            color: '#fff',
-                            font: { weight: 'bold', size: 10 },
-                            formatter: (value) => value > 0 ? value : ''
-                        }
-                    } 
+                {
+                    label: 'Attention',
+                    data: cats.map(c => data.filter(i => (i.CATEGORY || "").includes(c) && (i.STATUS_LICENSE || "").trim().toUpperCase() === 'ATTENTION').length),
+                    backgroundColor: '#fb5607',
+                    barPercentage: 0.2, // Membuat diagram balok tipis
+                    categoryPercentage: 0.8
+                },
+                {
+                    label: 'Broken',
+                    data: cats.map(c => data.filter(i => (i.CATEGORY || "").includes(c) && (i.STATUS_LICENSE || "").trim().toUpperCase() === 'BROKEN').length),
+                    backgroundColor: '#1e293b',
+                    barPercentage: 0.2, // Membuat diagram balok tipis
+                    categoryPercentage: 0.8
                 }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
+                x: { grid: { display: false } }
+            },
+            plugins: {
+                legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#1a427a',
+                    font: { weight: 'bold', size: 9 },
+                    formatter: (value) => value > 0 ? value : '' // Sembunyikan angka jika 0
+                }
+            }
+        }
+    });
+}
+
+        function renderSection2(data) {
+            const depts = ['Energy', 'Logistic'];
+            const ctxDPie = document.getElementById('deptPieChart').getContext('2d');
+            if (charts.deptPie) charts.deptPie.destroy();
+            charts.deptPie = new Chart(ctxDPie, {
+                type: 'pie',
+                data: {
+                    labels: depts,
+                    datasets: [{ data: depts.map(d => data.filter(i => (i.SECTION||"").includes(d)).length), backgroundColor: ['#3a86ff', '#002050'] }]
+                },
+                options: { maintainAspectRatio: false }
             });
 
-            const ctxBar = document.getElementById('barStatusChart').getContext('2d');
-            if (charts.bar) charts.bar.destroy();
-            charts.bar = new Chart(ctxBar, {
+            const ctxDBar = document.getElementById('deptStatusBarChart').getContext('2d');
+            if (charts.deptBar) charts.deptBar.destroy();
+            charts.deptBar = new Chart(ctxDBar, {
                 type: 'bar',
                 data: {
-                    labels: ['Valid', 'Attention', 'Scrap', 'Broken'],
-                    datasets: [{
-                        label: 'Units',
-                        data: [stats.VALID, stats.ATTENTION, stats.PLAN_SCRAP, stats.BROKEN],
-                        backgroundColor: '#4b2c7f',
-                        borderRadius: 6
-                    }]
-                },
-                options: { 
-                    maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { display: false },
-                        datalabels: { anchor: 'end', align: 'top', color: '#4b2c7f', font: { weight: 'bold' } } 
-                    }
-                }
-            });
-        }
-
-        function renderSectionChart(data) {
-            const sections = { Energy: { v:0, a:0 }, Logistic: { v:0, a:0 } };
-            data.forEach(i => {
-                const s = (i.SECTION || "").includes('Energy') ? 'Energy' : 'Logistic';
-                if(checkStatus(i, 'VALID')) sections[s].v++;
-                if(checkStatus(i, 'ATTENTION')) sections[s].a++;
-            });
-
-            const ctx = document.getElementById('sectionBarChart').getContext('2d');
-            if (charts.section) charts.section.destroy();
-            charts.section = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Energy', 'Logistic'],
+                    labels: depts,
                     datasets: [
-                        { label: 'Valid', data: [sections.Energy.v, sections.Logistic.v], backgroundColor: '#4b2c7f', borderRadius: 4 },
-                        { label: 'Attention', data: [sections.Energy.a, sections.Logistic.a], backgroundColor: '#ffc629', borderRadius: 4 }
+                        { label: 'Valid', data: depts.map(d => data.filter(i => (i.SECTION||"").includes(d) && (i.STATUS_LICENSE||"") === 'VALID').length), backgroundColor: '#3a86ff' },
+                        { label: 'Attention', data: depts.map(d => data.filter(i => (i.SECTION||"").includes(d) && (i.STATUS_LICENSE||"") === 'ATTENTION').length), backgroundColor: '#fb5607' }
                     ]
                 },
-                options: { 
-                    indexAxis: 'y', 
+                options: {
                     maintainAspectRatio: false,
-                    plugins: { datalabels: { color: '#fff', font: { weight: 'bold', size: 11 } } }
+                    barPercentage: 0.15, // Sangat Tipis
+                    plugins: { datalabels: { anchor: 'end', align: 'top' } },
+                    scales: { x: { grid: { display: false } }, y: { display: false } }
                 }
             });
         }
 
         function renderTable(data) {
             const tbody = document.getElementById('dataTableBody');
-            const indicator = document.getElementById('filterIndicator');
-            
-            let filtered = data;
-            if (activeStatusFilter) {
-                filtered = data.filter(i => checkStatus(i, activeStatusFilter));
-                indicator.classList.remove('hidden');
-                document.getElementById('activeFilterName').innerText = activeStatusFilter;
-            } else {
-                indicator.classList.add('hidden');
-            }
-
-            tbody.innerHTML = filtered.map(item => `
-                <tr class="hover:bg-blue-50/50 transition-colors">
-                    <td class="px-6 py-4 font-bold text-gray-700">${item.SECTION || '-'}</td>
-                    <td class="px-6 py-4 text-gray-500">${item.CLASIFICATION || '-'}</td>
-                    <td class="px-6 py-4 font-black text-vale-purple">${item.EQUIPMENT || '-'}</td>
-                    <td class="px-6 py-4 font-mono text-gray-600">${item.DUE_DATE || '-'}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 rounded-full text-[9px] font-black shadow-sm ${getStatusBadgeClass(item.STATUS_LICENSE)}">
+            tbody.innerHTML = data.slice(0, 100).map(item => `
+                <tr class="hover:bg-blue-50 transition-colors">
+                    <td class="p-4 border-r text-gray-400 font-bold">${item.CATEGORY || '-'}</td>
+                    <td class="p-4 border-r text-gray-500 font-medium">${item.SECTION || '-'}</td>
+                    <td class="p-4 border-r font-black text-[#1a427a]">${item.EQUIPMENT || '-'}</td>
+                    <td class="p-4">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black ${(item.STATUS_LICENSE||"") === 'VALID' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}">
                             ${item.STATUS_LICENSE || '-'}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-right font-black text-red-600">${item.TIME_REMAIN || 0} DAYS</td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
         }
 
-        function getStatusBadgeClass(status) {
-            const s = (status || "").trim().toUpperCase();
-            if (s === 'VALID') return 'bg-green-500 text-white';
-            if (s === 'ATTENTION') return 'bg-yellow-400 text-vale-purple';
-            if (s === 'PLAN_SCRAP' || s === 'BROKEN') return 'bg-red-600 text-white';
-            return 'bg-gray-200 text-gray-600';
-        }
-
-        function clearTableFilter() {
-            activeStatusFilter = null;
-            const area = document.getElementById('areaSelector').value;
-            updateDashboard(area);
-        }
-
-        function renderReminders(items) {
-            const container = document.getElementById('reminderContainer');
-            if (items.length === 0) {
-                container.innerHTML = '<p class="text-white/50 text-xs italic">No items require attention.</p>';
-                return;
-            }
-            container.innerHTML = items.slice(0, 10).map(item => `
-                <div class="bg-white p-4 rounded-xl border-l-8 border-vale-gold flex justify-between items-center shadow-lg transform transition hover:scale-[1.02]">
-                    <div class="max-w-[60%]">
-                        <p class="text-[12px] font-black text-vale-purple uppercase truncate">${item.EQUIPMENT || 'Unit'}</p>
-                        <p class="text-[9px] text-gray-400 font-bold uppercase mt-1">${item.SECTION || '-'}</p>
-                    </div>
-                    <span class="bg-red-600 text-white text-[11px] px-5 py-2 rounded-full font-black shadow-md whitespace-nowrap">
-                        ${item.TIME_REMAIN || 0} DAYS
-                    </span>
-                </div>
-            `).join('');
-        }
-
-        // Jam Real-time
-        setInterval(() => {
+        // Realtime Clock Function
+        function updateClock() {
             const now = new Date();
-            document.getElementById('live-clock').innerText = now.toLocaleString('id-ID', { 
-                day: '2-digit', month: '2-digit', year: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
-            }).replace(/\./g, ':');
-        }, 1000);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            
+            document.getElementById('live-time').innerText = now.toLocaleTimeString('id-ID', { hour12: false });
+            document.getElementById('live-date').innerText = now.toLocaleDateString('id-ID', options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
         init();
     </script>
