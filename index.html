@@ -11,102 +11,94 @@
     <style>
         body { background-color: #00a2ed; font-family: 'Segoe UI', Tahoma, sans-serif; }
         .card-pbi { background: white; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        /* Header Biru Tua */
-        .header-pbi { background: #002050; color: white; padding: 12px 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .stat-box { background: #1a427a; color: white; border-radius: 4px; padding: 20px; text-align: center; }
+        .header-pbi { background: #002050; color: white; padding: 12px 24px; }
+        .stat-card { background: #002050; color: white; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; }
+        .stat-label { background: #1e3a8a; padding: 4px 8px; text-align: center; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .stat-num { background: #3a86ff; padding: 10px; text-align: center; font-size: 24px; font-weight: 900; line-height: 1; }
+        .stat-num-yellow { color: #ffc629; }
         .table-container::-webkit-scrollbar { height: 8px; width: 6px; }
         .table-container::-webkit-scrollbar-thumb { background: #1a427a; border-radius: 10px; }
+        canvas { cursor: pointer; }
+        thead th { position: sticky; top: 0; background: #f8fafc; z-index: 10; border-bottom: 2px solid #e2e8f0; }
     </style>
 </head>
-<body class="p-4">
+<body class="p-3">
 
-    <nav class="header-pbi mb-6 rounded shadow-lg flex justify-between items-center">
+    <nav class="header-pbi mb-4 rounded shadow-lg flex justify-between items-center text-white">
         <div class="flex items-center gap-6">
-    <div class="flex items-center justify-center w-32 md:w-40">
-        <img src="logo-vale.png" alt="Vale Logo" class="h-" 
-             alt="Vale Logo" 
-             class="h-8 md:h-12 w-auto object-contain brightness-0 invert"> 
-             </div>
-    <div class="h-10 w-[2px] bg-white/20 hidden md:block"></div>
-    <div>
-        <h1 class="font-bold uppercase tracking-tight text-lg md:text-xl leading-none text-white">Monitoring Compliance</h1>
-        <p class="text-[10px] opacity-70 uppercase tracking-widest mt-1 text-white">Energy & Logistic Department</p>
-    </div>
-</div>
-
-        <div class="text-right flex flex-col justify-center border-l border-white/20 pl-6">
+            <div class="flex items-center justify-center w-32 md:w-40">
+                <img src="logo-vale.png" alt="Vale Logo" class="h-"> 
+            </div>
+            <div class="h-10 w-[2px] bg-white/20 hidden md:block"></div>
+            <div>
+                <h1 class="font-bold uppercase tracking-tighter text-lg md:text-xl leading-none">Monitoring Compliance</h1>
+                <p class="text-[10px] opacity-70 uppercase tracking-widest mt-1 text-white">Energy & Logistic Department</p>
+            </div>
+        </div>
+        <div class="text-right border-l border-white/20 pl-6 text-white">
             <p id="live-time" class="text-2xl font-black text-[#ffc629] font-mono leading-none"></p>
             <p id="live-date" class="text-[10px] uppercase font-bold tracking-widest opacity-80 mt-1"></p>
         </div>
     </nav>
 
-    <div class="max-w-[1800px] mx-auto space-y-6">
-        
-        <div class="grid grid-cols-12 gap-6">
-            <div class="col-span-12 lg:col-span-4 card-pbi p-6 relative">
+    <div class="max-w-[1800px] mx-auto space-y-4">
+        <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12 lg:col-span-4 card-pbi p-5 relative">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <span class="text-xs font-black text-gray-500 uppercase">Compliance Distribution</span>
-                    <select id="areaSelector" class="border text-[10px] p-1 rounded bg-gray-50 font-bold outline-none cursor-pointer hover:bg-gray-100"></select>
+                    <span id="pieTitle" class="text-[14px] font-black text-gray-500 uppercase">Compliance Distribution</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="resetTableFilter()" class="text-[8px] bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded font-bold uppercase transition-colors">
+                            <i class="fas fa-sync-alt mr-1"></i>Reset
+                        </button>
+                        <select id="areaSelector" class="border text-[10px] p-1 rounded bg-gray-50 font-bold outline-none cursor-pointer"></select>
+                    </div>
                 </div>
-                <div class="h-[300px]"><canvas id="catPieChart"></canvas></div>
-                <div class="absolute top-[58%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                    <p class="text-[10px] text-gray-400 uppercase font-bold">Total Assets</p>
-                    <h2 id="totalCenter" class="text-4xl font-black text-[#1a427a]">0</h2>
+                <div class="h-[280px] relative">
+                    <canvas id="catPieChart"></canvas>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none" style="margin-top: 15px;">
+                        <p class="text-[9px] text-gray-400 uppercase font-extrabold leading-none">Total Assets</p>
+                        <h2 id="totalCenter" class="text-4xl font-black text-[#1a427a] leading-tight">0</h2>
+                    </div>
                 </div>
             </div>
-
-            <div class="col-span-12 lg:col-span-8 card-pbi p-6">
-                <p class="text-[10px] font-black text-gray-500 uppercase mb-4 border-b pb-2">Compliance Status Breakdown</p>
-                <div class="h-[300px]"><canvas id="catStatusBarChart"></canvas></div>
+            <div class="col-span-12 lg:col-span-8 card-pbi p-5">
+                <p id="barTitle" class="text-sm font-black text-gray-500 uppercase mb-4 border-b pb-2 text-center">Status of Compliance by Category</p>
+                <div class="h-[280px]"><canvas id="catStatusBarChart"></canvas></div>
             </div>
         </div>
 
-        <div class="grid grid-cols-12 gap-6">
-            <div class="col-span-12 lg:col-span-4 card-pbi p-6">
-                <p class="text-[10px] font-black text-gray-500 uppercase mb-4 border-b pb-2 text-center">Energy vs Logistic Ratio</p>
-                <div class="h-[250px]"><canvas id="deptPieChart"></canvas></div>
-            </div>
-
-            <div class="col-span-12 lg:col-span-5 card-pbi p-6">
-                <p class="text-[10px] font-black text-gray-500 uppercase mb-4 border-b pb-2 text-center">Status by Department</p>
-                <div class="h-[250px]"><canvas id="deptStatusBarChart"></canvas></div>
-            </div>
-
-            <div class="col-span-12 lg:col-span-3 space-y-4">
-                <div class="stat-box shadow-xl border-b-4 border-white/10">
-                    <p class="text-[10px] uppercase font-bold opacity-80 mb-1">Total Equipment</p>
-                    <h2 id="totalRight" class="text-5xl font-black">0</h2>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="stat-box py-4">
-                        <p class="text-[9px] uppercase font-bold opacity-80">Energy</p>
-                        <p id="cntEnergy" class="text-2xl font-black">0</p>
-                    </div>
-                    <div class="stat-box py-4">
-                        <p class="text-[9px] uppercase font-bold opacity-80">Logistic</p>
-                        <p id="cntLogistic" class="text-2xl font-black">0</p>
-                    </div>
-                </div>
-                <div class="stat-box py-4 bg-[#002050] border-t-4 border-[#ffc629]">
-                    <p class="text-[10px] uppercase font-bold opacity-80">Comply Percentage</p>
-                    <h2 class="text-4xl font-black text-[#ffc629]">98%</h2>
+        <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12 lg:col-span-4 card-pbi p-5"><div class="h-[220px]"><canvas id="deptPieChart"></canvas></div></div>
+            <div class="col-span-12 lg:col-span-5 card-pbi p-5"><div class="h-[220px]"><canvas id="deptStatusBarChart"></canvas></div></div>
+            <div class="col-span-12 lg:col-span-3 grid grid-cols-1 gap-2">
+                <div class="stat-card shadow-md"><div class="stat-label">TOTAL EQUIPMENT</div><div id="totalRight" class="stat-num">0</div></div>
+                <div class="stat-card shadow-md"><div class="stat-label">COMPLY PERCENTAGE</div><div id="compliancePercent" class="stat-num stat-num-yellow">0%</div></div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="stat-card"><div class="stat-label">ENERGY</div><div id="cntEnergy" class="stat-num !text-lg !p-3">0</div></div>
+                    <div class="stat-card"><div class="stat-label">LOGISTIC</div><div id="cntLogistic" class="stat-num !text-lg !p-3">0</div></div>
+                    <div class="stat-card"><div class="stat-label">REPORTS</div><div id="cntReporting" class="stat-num !text-lg !p-3">0</div></div>
                 </div>
             </div>
         </div>
 
-        <div class="card-pbi overflow-hidden mb-8">
-            <div class="bg-gray-100 p-3 text-[10px] font-black uppercase border-b flex justify-between">
-                <span>Detailed Equipment List</span>
-                <span class="text-[#1a427a]">PT. Vale Indonesia Tbk.</span>
+        <div class="card-pbi overflow-hidden">
+            <div class="bg-gray-100 p-3 border-b flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <h3 id="tableHeader" class="text-[11px] font-black text-[#002050] uppercase">Asset Data Details</h3>
+                    <span id="rowCount" class="bg-blue-600 text-white text-[9px] px-2 py-0.5 rounded-full">0 Items</span>
+                </div>
+                <button onclick="resetTableFilter()" class="text-[9px] bg-[#1a427a] text-white px-4 py-1 rounded font-bold hover:bg-[#002050]">RESET FILTERS</button>
             </div>
-            <div class="table-container overflow-x-auto max-h-[400px]">
+            <div class="table-container overflow-x-auto max-h-[450px]">
                 <table class="min-w-full text-[11px] text-left border-collapse">
-                    <thead class="bg-white sticky top-0 border-b z-10 shadow-sm">
-                        <tr>
-                            <th class="p-4 border-r font-black text-gray-400">CATEGORY</th>
-                            <th class="p-4 border-r font-black text-gray-400">SECTION</th>
-                            <th class="p-4 border-r font-black text-gray-400">EQUIPMENT</th>
-                            <th class="p-4 font-black text-gray-400">STATUS</th>
+                    <thead>
+                        <tr class="bg-slate-50">
+                            <th class="p-3 border-r font-black text-slate-600 w-12 text-center uppercase">No</th>
+                            <th class="p-3 border-r font-black text-slate-600 uppercase">Category</th>
+                            <th class="p-3 border-r font-black text-slate-600 uppercase">Section</th>
+                            <th class="p-3 border-r font-black text-slate-600 uppercase">Equipment Name</th>
+                            <th class="p-3 border-r font-black text-slate-600 uppercase">Expired Date</th>
+                            <th class="p-3 font-black text-slate-600 text-center uppercase">Status</th>
                         </tr>
                     </thead>
                     <tbody id="dataTableBody" class="divide-y bg-white"></tbody>
@@ -117,16 +109,21 @@
 
     <script>
         Chart.register(ChartDataLabels);
-        
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwl68NIDQAuHyOQBmRMc1MdCibl9BJ9dQVNYQyo8klve-32GlwAmiy1jGL6RTma0-h6Tw/exec";
-        let masterData = {}, charts = {};
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_Z-FpbUWGuDeHeEI5Rx3JyrEjeWmdM-K2RnFpLo77BORMQ1iz-U25yCs5YD0WCVwy/exec"; 
+        let masterData = {}, charts = {}, currentActiveData = [];
+
+        const STATUS_COLORS = { 
+            'VALID': '#2563eb', 'ATTENTION': '#3b82f6', 'BROKEN': '#1e3a8a', 
+            'NEW': '#93c5fd', 'REMINDER': '#fbbf24', 'DONE': '#f97316', 
+            'PROGRESS': '#a855f7', 'PLAN SCRAP': '#64748b', 
+            'HOLD': '#94a3b8', 'NOT USE': '#0f172a'
+        };
 
         async function init() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 masterData = await response.json();
                 const sel = document.getElementById('areaSelector');
-                
                 sel.innerHTML = '<option value="HOME">ALL AREAS (HOME)</option>';
                 Object.keys(masterData).forEach(name => {
                     if(name !== "Main Data for Looker Studio") {
@@ -134,127 +131,166 @@
                         opt.value = name; opt.innerText = name; sel.appendChild(opt);
                     }
                 });
-
                 sel.addEventListener('change', (e) => updateUI(e.target.value));
                 updateUI("HOME");
-            } catch (err) { console.error("Error:", err); }
+            } catch (err) { console.error(err); }
         }
 
         function updateUI(area) {
-            let data;
+            const mainData = masterData["Main Data for Looker Studio"] || [];
+            const sel = document.getElementById('areaSelector');
+            if(sel.value !== area) sel.value = area;
+
+            let searchKey = area.toLowerCase().replace('list', '').trim();
+            if (searchKey.includes('permit')) searchKey = 'permit';
+            if (searchKey.includes('report')) searchKey = 'report';
+
+            let tableData = (area === "HOME") ? mainData : mainData.filter(i => (i.CATEGORY || "").toLowerCase().includes(searchKey));
+            currentActiveData = tableData;
+
+            document.getElementById('totalRight').innerText = tableData.length;
+            // Menghitung jumlah berdasarkan SECTION dengan lebih teliti
+            document.getElementById('cntEnergy').innerText = tableData.filter(i => {
+            const section = (i.SECTION || i.Section || "").toString().toUpperCase().trim();
+            return section.includes('ENERGY');
+            }).length;
+
+            document.getElementById('cntLogistic').innerText = tableData.filter(i => {
+            const section = (i.SECTION || i.Section || "").toString().toUpperCase().trim();
+            return section.includes('LOGISTIC');
+            }).length;
+
+            document.getElementById('cntReporting').innerText = tableData.filter(i => {
+            const category = (i.CATEGORY || i.Category || "").toString().toUpperCase().trim();
+            return category.includes('REPORT');
+            }).length;
+            
+            const validDone = tableData.filter(i => ['VALID', 'DONE', 'PROGRESS', 'ATTENTION', 'REMINDER'].includes(((i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase()))).length;
+            document.getElementById('compliancePercent').innerText = tableData.length > 0 ? ((validDone / tableData.length) * 100).toFixed(0) + "%" : "0%";
+
+            renderCharts(mainData, tableData, area);
+            renderTable(tableData);
+        }
+
+        function renderCharts(mainData, tableData, area) {
+            let labels, plotData, bgColors, datasets = [];
+            const statusTypes = Object.keys(STATUS_COLORS);
+            const catsSearch = ['Annual', 'Certification', 'Permit', 'Report'];
+            document.getElementById('totalCenter').innerText = tableData.length;
+
             if (area === "HOME") {
-                // HANYA ambil data dari sheet Looker Studio (Target 473)
-                data = masterData["Main Data for Looker Studio"];
-                if (!data) data = Object.values(masterData).flat();
+                labels = ['Annual Insp', 'Certification', 'Permit', 'Report'];
+                plotData = catsSearch.map(c => mainData.filter(i => (i.CATEGORY || "").toLowerCase().includes(c.toLowerCase())).length);
+                bgColors = ['#2563eb', '#1e3a8a', '#f97316', '#a855f7'];
+
+                datasets = statusTypes.map(s => ({
+                    label: s,
+                    data: catsSearch.map(cat => mainData.filter(i => (i.CATEGORY || "").toLowerCase().includes(cat.toLowerCase()) && (i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase() === s).length),
+                    backgroundColor: STATUS_COLORS[s], 
+                    barPercentage: 0.8, categoryPercentage: 1
+                }));
             } else {
-                data = masterData[area];
+                const isReporting = area.toLowerCase().includes('report');
+                labels = isReporting ? ['DONE', 'PROGRESS'] : statusTypes;
+                plotData = labels.map(s => tableData.filter(i => (i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase() === s).length);
+                bgColors = labels.map(l => STATUS_COLORS[l] || '#ccc');
+                datasets = statusTypes.map(s => ({
+                    label: s,
+                    data: [tableData.filter(i => (i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase() === s).length],
+                    backgroundColor: STATUS_COLORS[s], 
+                    barPercentage: 0.5
+                }));
             }
 
-            if (!data) return;
-
-            document.getElementById('totalCenter').innerText = data.length;
-            document.getElementById('totalRight').innerText = data.length;
-            document.getElementById('cntEnergy').innerText = data.filter(i => (i.SECTION||"").includes('Energy')).length;
-            document.getElementById('cntLogistic').innerText = data.filter(i => (i.SECTION||"").includes('Logistic')).length;
-
-            renderCharts(data);
-            renderSection2(data);
-            renderTable(data);
-        }
-
-        function renderCharts(data) {
-    const area = document.getElementById('areaSelector').value;
-    
-    // Nama kategori utama sesuai referensi
-    const cats = ['Annual Inspection', 'Certification', 'Permit', 'Reporting'];
-    
-    // 1. DOUGHNUT CHART (KIRI) - Distribusi Total per Kategori
-    const catCounts = cats.map(c => data.filter(i => (i.CATEGORY || "").includes(c)).length);
-    
-    const ctxPie = document.getElementById('catPieChart').getContext('2d');
-    if (charts.catPie) charts.catPie.destroy();
-    charts.catPie = new Chart(ctxPie, {
-        type: 'doughnut',
-        data: {
-            labels: cats,
-            datasets: [{ 
-                data: catCounts, 
-                backgroundColor: ['#3a86ff', '#1a427a', '#fb5607', '#7209b7'],
-                hoverOffset: 15
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            cutout: '75%',
-            plugins: { 
-                legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } },
-                datalabels: { color: '#fff', font: { weight: 'bold', size: 11 } }
-            }
-        }
-    });
-
-    // 2. GROUPED BAR CHART (KANAN) - Status per Kategori (Valid, Attention, Broken)
-    const ctxBar = document.getElementById('catStatusBarChart').getContext('2d');
-    if (charts.barStatus) charts.barStatus.destroy();
-    charts.barStatus = new Chart(ctxBar, {
-        type: 'bar',
-        data: {
-            labels: cats,
-            datasets: [
-                {
-                    label: 'Valid',
-                    data: cats.map(c => data.filter(i => (i.CATEGORY || "").includes(c) && (i.STATUS_LICENSE || "").trim().toUpperCase() === 'VALID').length),
-                    backgroundColor: '#3a86ff',
-                    barPercentage: 0.2, // Membuat diagram balok tipis
-                    categoryPercentage: 0.8
-                },
-                {
-                    label: 'Attention',
-                    data: cats.map(c => data.filter(i => (i.CATEGORY || "").includes(c) && (i.STATUS_LICENSE || "").trim().toUpperCase() === 'ATTENTION').length),
-                    backgroundColor: '#fb5607',
-                    barPercentage: 0.2, // Membuat diagram balok tipis
-                    categoryPercentage: 0.8
-                },
-                {
-                    label: 'Broken',
-                    data: cats.map(c => data.filter(i => (i.CATEGORY || "").includes(c) && (i.STATUS_LICENSE || "").trim().toUpperCase() === 'BROKEN').length),
-                    backgroundColor: '#1e293b',
-                    barPercentage: 0.2, // Membuat diagram balok tipis
-                    categoryPercentage: 0.8
+            const ctxPie = document.getElementById('catPieChart').getContext('2d');
+            if (charts.catPie) charts.catPie.destroy();
+            charts.catPie = new Chart(ctxPie, {
+                type: 'doughnut', data: { labels: labels, datasets: [{ data: plotData, backgroundColor: bgColors }] },
+                options: { 
+                    maintainAspectRatio: false, cutout: '75%',
+                    onClick: (evt, item) => {
+                        if (item.length > 0) {
+                            const index = item[0].index;
+                            const labelClicked = labels[index];
+                            if (area === "HOME") {
+                                const mapping = { 'Annual Insp': 'List Annual Insp', 'Cert': 'List Certification', 'Permit': 'List Permit', 'Report': 'List Reporting' };
+                                updateUI(mapping[labelClicked] || "HOME");
+                            } else {
+                                renderTable(currentActiveData.filter(i => (i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase() === labelClicked.toUpperCase()));
+                            }
+                        }
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { weight: 'bold' } } }, datalabels: { display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0, color: '#fff', font: { weight: 'bold' } } }
                 }
-            ]
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
-                x: { grid: { display: false } }
-            },
-            plugins: {
-                legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
-                datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    color: '#1a427a',
-                    font: { weight: 'bold', size: 9 },
-                    formatter: (value) => value > 0 ? value : '' // Sembunyikan angka jika 0
-                }
-            }
-        }
-    });
-}
+            });
 
-        function renderSection2(data) {
+            // --- BAGIAN YANG DIPERBAIKI PADA STATUS BAR CHART ---
+            const ctxBar = document.getElementById('catStatusBarChart').getContext('2d');
+            if (charts.catBar) charts.catBar.destroy();
+            charts.catBar = new Chart(ctxBar, {
+                type: 'bar', 
+                data: { 
+                    labels: (area === "HOME" ? labels : [area.replace('List ', '')]), 
+                    datasets: datasets 
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            top: 30 // Memberikan ruang ekstra di dalam canvas agar angka tidak terpotong
+                        }
+                    },
+                    onClick: (evt, item) => {
+                        if (item.length > 0) {
+                            const status = datasets[item[0].datasetIndex].label;
+                            renderTable(currentActiveData.filter(i => (i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase() === status.toUpperCase()));
+                        }
+                    },
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            grace: '15%', // Menambahkan ruang kosong 15% di atas batang tertinggi secara otomatis
+                            ticks: {
+                                font: { size: 10 }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 10, weight: 'bold' }
+                            }
+                        }
+                    },
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { boxWidth: 10, font: { size: 8 } } 
+                        }, 
+                        datalabels: { 
+                            anchor: 'end', 
+                            align: 'top', 
+                            offset: 2, // Jarak angka dari ujung batang
+                            font: { weight: 'bold', size: 10 }, 
+                            formatter: (v) => v > 0 ? v : '' 
+                        } 
+                    }
+                }
+            });
+
             const depts = ['Energy', 'Logistic'];
             const ctxDPie = document.getElementById('deptPieChart').getContext('2d');
             if (charts.deptPie) charts.deptPie.destroy();
             charts.deptPie = new Chart(ctxDPie, {
-                type: 'pie',
-                data: {
-                    labels: depts,
-                    datasets: [{ data: depts.map(d => data.filter(i => (i.SECTION||"").includes(d)).length), backgroundColor: ['#3a86ff', '#002050'] }]
-                },
-                options: { maintainAspectRatio: false }
+                type: 'pie', data: { labels: depts, datasets: [{ data: depts.map(d => tableData.filter(i => (i.SECTION||"").toLowerCase().includes(d.toLowerCase())).length), backgroundColor: ['#3a86ff', '#002050'] }] },
+                options: { 
+                    maintainAspectRatio: false,
+                    onClick: (evt, item) => {
+                        if (item.length > 0) {
+                            const dept = depts[item[0].index];
+                            renderTable(currentActiveData.filter(i => (i.SECTION || "").toLowerCase().includes(dept.toLowerCase())));
+                        }
+                    },
+                    plugins: { legend: { position: 'bottom' } } 
+                }
             });
 
             const ctxDBar = document.getElementById('deptStatusBarChart').getContext('2d');
@@ -264,45 +300,89 @@
                 data: {
                     labels: depts,
                     datasets: [
-                        { label: 'Valid', data: depts.map(d => data.filter(i => (i.SECTION||"").includes(d) && (i.STATUS_LICENSE||"") === 'VALID').length), backgroundColor: '#3a86ff' },
-                        { label: 'Attention', data: depts.map(d => data.filter(i => (i.SECTION||"").includes(d) && (i.STATUS_LICENSE||"") === 'ATTENTION').length), backgroundColor: '#fb5607' }
+                        { label: 'Valid/Done', data: depts.map(d => tableData.filter(i => (i.SECTION||"").toLowerCase().includes(d.toLowerCase()) && ['VALID', 'DONE'].includes((i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase())).length), backgroundColor: '#3a86ff' },
+                        { label: 'Attention/Etc', data: depts.map(d => tableData.filter(i => (i.SECTION||"").toLowerCase().includes(d.toLowerCase()) && !['VALID', 'DONE'].includes((i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase())).length), backgroundColor: '#fb5607' }
                     ]
                 },
-                options: {
+                options: { 
                     maintainAspectRatio: false,
-                    barPercentage: 0.15, // Sangat Tipis
-                    plugins: { datalabels: { anchor: 'end', align: 'top' } },
-                    scales: { x: { grid: { display: false } }, y: { display: false } }
+                    onClick: (evt, item) => {
+                        if (item.length > 0) {
+                            const dept = depts[item[0].index];
+                            const isBlue = item[0].datasetIndex === 0;
+                            const filtered = currentActiveData.filter(i => {
+                                const matchDept = (i.SECTION || "").toLowerCase().includes(dept.toLowerCase());
+                                const status = (i.STATUS_LICENSE || i.STATUS || "").trim().toUpperCase();
+                                return isBlue ? (matchDept && ['VALID', 'DONE'].includes(status)) : (matchDept && !['VALID', 'DONE'].includes(status));
+                            });
+                            renderTable(filtered);
+                        }
+                    },
+                    scales: { y: { display: false } } 
                 }
             });
         }
 
+        // Logic Baru untuk Pemetaan Expired Date
         function renderTable(data) {
             const tbody = document.getElementById('dataTableBody');
-            tbody.innerHTML = data.slice(0, 100).map(item => `
-                <tr class="hover:bg-blue-50 transition-colors">
-                    <td class="p-4 border-r text-gray-400 font-bold">${item.CATEGORY || '-'}</td>
-                    <td class="p-4 border-r text-gray-500 font-medium">${item.SECTION || '-'}</td>
-                    <td class="p-4 border-r font-black text-[#1a427a]">${item.EQUIPMENT || '-'}</td>
-                    <td class="p-4">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-black ${(item.STATUS_LICENSE||"") === 'VALID' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}">
-                            ${item.STATUS_LICENSE || '-'}
-                        </span>
+            document.getElementById('rowCount').innerText = data.length + " Items";
+            
+            tbody.innerHTML = data.map((item, index) => {
+                const category = item.CATEGORY || item.Category || "-";
+                const section = item.SECTION || item.Section || "-";
+                const equipment = item.EQUIPMENT || item.Equipment || item.DESCRIPTION || "-";
+                const status = (item.STATUS_LICENSE || item.STATUS || item.Status || "N/A").trim().toUpperCase();
+                
+                // Fuzzy Search Key untuk kolom Expired Date
+                const rawExpDate = item["Expired Date"] || item["EXPIRED DATE"] || item.EXPIRED_DATE || item.DATE || item.Date || item.TANGGAL || item.tanggal || "-";
+                
+                let displayDate = "-";
+                if(rawExpDate && rawExpDate !== "-") {
+                    try {
+                        const d = new Date(rawExpDate);
+                        if(!isNaN(d.getTime())) {
+                            // Format: DD-MMM-YYYY (Contoh: 30-Jan-2026)
+                            displayDate = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                        } else { 
+                            displayDate = rawExpDate; // Jika string teks biasa
+                        }
+                    } catch(e) { 
+                        displayDate = rawExpDate; 
+                    }
+                }
+
+                return `
+                <tr class="hover:bg-blue-50 border-b">
+                    <td class="p-3 border-r text-center text-gray-400 font-medium">${index + 1}</td>
+                    <td class="p-3 border-r font-bold text-slate-700">${category}</td>
+                    <td class="p-3 border-r text-gray-500">${section}</td>
+                    <td class="p-3 border-r font-black text-[#1a427a] uppercase">${equipment}</td>
+                    <td class="p-3 border-r font-mono text-gray-700 font-bold">${displayDate}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black ${getStatusClass(status)}">${status}</span>
                     </td>
-                </tr>`).join('');
+                </tr>`;
+            }).join('');
         }
 
-        // Realtime Clock Function
+        function getStatusClass(status) {
+            const s = status.toUpperCase();
+            if (['VALID', 'DONE'].includes(s)) return 'bg-blue-100 text-blue-700';
+            if (['ATTENTION', 'PROGRESS', 'REMINDER', 'NEW'].includes(s)) return 'bg-orange-100 text-orange-700';
+            if (['PLAN SCRAP', 'HOLD', 'NOT USE'].includes(s)) return 'bg-slate-200 text-slate-700';
+            return 'bg-red-100 text-red-700';
+        }
+
+        function resetTableFilter() { updateUI("HOME"); }
+
         function updateClock() {
             const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            
             document.getElementById('live-time').innerText = now.toLocaleTimeString('id-ID', { hour12: false });
-            document.getElementById('live-date').innerText = now.toLocaleDateString('id-ID', options);
+            document.getElementById('live-date').innerText = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
         setInterval(updateClock, 1000);
         updateClock();
-
         init();
     </script>
 </body>
